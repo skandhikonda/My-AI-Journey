@@ -244,7 +244,7 @@ A simple way to remember the difference is:
 
 > **Easy development + Speed + Less coding → No-Code / Low-Code Frameworks**
 
-The choice of framework ultimately depends on the **complexity of the application, required customization, development speed, and level of control** needed.
+The choice of framework ultimately depends on the **complexity of the application, required customization, development speed, and level of control** needed..
 
 ---
 
