@@ -552,6 +552,134 @@ Context Window
 The maximum information the model can handle
 ```
 
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+
+# Create LLM
+llm = ChatOpenAI(model="gpt-4")
+
+# Store conversation history
+messages = []
+
+# System message
+system_message = SystemMessage(
+    content="You are a helpful AI assistant."
+)
+
+messages.append(system_message)
+
+while True:
+
+    user_input = input("You: ")
+
+    if user_input.lower() == "exit":
+        break
+
+    # Add user's message
+    human_message = HumanMessage(content=user_input)
+    messages.append(human_message)
+
+    # Send complete conversation history to LLM
+    ai_message = llm.invoke(messages)
+
+    # Add LLM response to conversation history
+    messages.append(ai_message)
+
+    # Display response
+    print("AI:", ai_message.content)
+```
+
+### The important part for understanding the context window
+
+The key line is:
+
+```python
+ai_message = llm.invoke(messages)
+```
+
+Because `messages` contains the **entire conversation history**, every time you ask a new question, you're potentially sending:
+
+```text
+System Message
+      +
+Human Message 1
+      +
+AI Message 1
+      +
+Human Message 2
+      +
+AI Message 2
+      +
+Human Message 3
+      +
+AI Message 3
+      +
+...
+Current Human Message
+```
+
+That's exactly what the instructor was explaining in the video. He specifically says that the application keeps appending both the Human and AI messages and sends the messages to the LLM again for the next continuation. :chatgpt-content-reference{index="0"}
+
+---
+
+## But there was another program/demo
+
+The instructor then uses this conversation-history approach to explain the **context-window limitation**.
+
+His example was essentially:
+
+```text
+Request 1 → send conversation
+Request 2 → send conversation + Request 1
+Request 3 → send conversation + Requests 1 & 2
+...
+Request 100 → send a very large conversation
+```
+
+Eventually:
+
+```text
+              Context Window
+┌──────────────────────────────────────┐
+│ System message                       │
+│ Human message                        │
+│ AI message                           │
+│ Human message                        │
+│ AI message                           │
+│ Human message                        │
+│ ...                                  │
+│ ...                                  │
+│ ...                                  │
+└──────────────────────────────────────┘
+                 ↑
+          Maximum tokens
+```
+
+The instructor explains that **the context window is measured in tokens**, not pages or lines. :chatgpt-content-reference{index="1"}
+
+---
+
+### One correction that's important for your notes
+
+The instructor's code is intentionally a **learning example**, not how you'd normally build production-grade conversation memory.
+
+The lesson is:
+
+```text
+Python list
+     ↓
+Understand how conversation context works
+     ↓
+Understand the context-window problem
+     ↓
+Then use LangChain's context/memory abstractions
+```
+
+He explicitly says that the context management demonstrated here is being implemented using **Python knowledge**, rather than LangChain's dedicated context-management mechanisms. :chatgpt-content-reference{index="2"}
+
+If you want, I can also give you a **small runnable program that reproduces the exact context-window demonstration**, where you can see **:chatgpt-content-reference{index="3"}**. That would make this concept much easier to understand.
+
 ---
 
 # 16. What happens when context becomes too large?
